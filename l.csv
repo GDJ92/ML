@@ -1,0 +1,72 @@
+x,y,z
+0,KNN,"np.random.seed(12)  **  np.random.randint(20, 40, 100) ///  random_number = np.random.uniform(0, 10, 10) //"
+1,split data,"from sklearn.model_selection import train_test_split;;; X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20 , random_state = 110)"
+2,euclidian distance,"def euclidean_distance(point1, point2): ;;; return np.sqrt(sum((point1-point2)**2))"
+3,manhattan_distance,"def manhattan_distance(point1, point2): ;;;  return np.sum(np.abs(point1-point2))"
+4,minkowski_distance,"def minkowski_distance(point1, point2,p): ;;;    return np.power(sum(np.abs(point1-point2)**p),1/p)"
+5,REGRESSION KNN prediction,"def predict_price(X_train,y_train,sample,p,k=5): ***     distances = [] ***     for x in X_train.to_numpy(): ***  distance = minkowski_distance(sample,x,p) ***    distances.append(distance) ***    sorted_distances =np.argsort(distances) ***  k_nearest_targets = y_train[sorted_distances[:k]] ***  predict_price = np.mean(k_nearest_targets) ***  return predict_price"
+6,CLASIFICATION KNN prediction,"def predict_class(X_train,y_train,sample,p, k=5): *** distances = [] ***   for x in X_train.to_numpy(): **  distance = minkowski_distance(sample,x,p) **   distances.append(distance) **   sorted_distances = np.argsort(distances) **  k_nearest_targets = y_train[sorted_distances[:k]] *** class_counts = np.bincount(k_nearest_targets) *** prediction = agrmax(class_counts) ***  return prediction"
+7,acceder un valor especifico de prediccion,"sample1 = X_test.iloc[1,:] ** k=11 ** predict_price(X_train,y_train,k,sample1)"
+8,acceder a un calor especifrico de y test,y_test[1]
+9,almacenar predicciones en y_preds,"y_preds= [] ** for x in X_test.to_numpy(): **    y_pred = predict_price(X_train,y_train,k,x,3) **     y_preds.append(y_pred) "
+10,MSE manual function,"def calculate_mse_for_k(X_train,y_train,X_test,y_test,k,p): **     y_preds= [] **     for sample in X_test.to_numpy(): **  y_pred = predict_price(X_train,y_train,sample,k,p) **   y_preds.append(y_pred) ** mse = mean_squared_error(y_test,y_preds) *** return mse"
+11,"function show all MSE values for k (3,30)","k_values = range(3,30) ** mse_values= [] ** for k in k_values: **   mse = calculate_mse_for_k(X_train,y_train,X_test,y_test,k,p=3) **   mse_values.append(mse)"
+12,SUMM KNN REGRESION SKLEARN,"from sklearn.neighbors import KNeighborsRegressor ** knn_regressor = KNeighborsRegressor(n_neighbors=11,p=3) ** knn_regressor.fit(X_train,y_train) ** y_pred = knn_regressor.predict(X_test) ** mse = mean_squared_error(y_test,y_pred) ** mse"
+13,DECISION TREE,
+14,create random numbers en una lista,"import numpy as np ** from numpy.random import default_rng ** rnd_list = default_rng(110) ** int_list = rnd_list.integers(low=5, high=50, size = 5)"
+15,function split data de una lista -mid point,def splits(x): **  splits_points = [] **  x_sorted = sorted(x) **   for i in range(len(x)-1): **  mid_point = (x_sorted[i] + x_sorted[i+1])/2   **   splits_points.append(mid_point)  **    return splits_points
+16,unir lista de random numbers con funcion de split data,splits(int_list)
+17,"random array of integers in shape (5, 3) MATRIX","int_twoDlist = rnd_list.integers(low=5, high=100, size = (5,3)) *** int_twoDlist"
+18,function that iterates over the columns and calculates the split points for each column (MATRIX)-mid point,"def splits_per_col(data): ***  col_split_pts = {} **  ncols = data.shape[1] **    for c in range(ncols): **    split_pts = splits(data[:,c])  **   col_split_pts['col_'+ str(c)] = split_pts **   return col_split_pts"
+19,return as a dictionary with column name as key and list of split points as value,splits_per_col(int_twoDlist)
+20,"create random array of integers in shape (5, 2) -","int_twoDlist = rnd_list.integers(low=5, high=100, size = (5,2)) *** int_twoDlist"
+21, First column as feature data X and the second column as regression target y,"def split_data(x,y,split_pt): **     mask = x > split_pt **     anti_mask = x < split_pt **     x_true = x[mask] **     y_true = y[mask]  **    x_false = x[anti_mask] **     y_false = y[anti_mask]  **    return x_true, y_true, x_false , y_false"
+22,,"x_true, y_true, x_false , y_false =split_data(int_twoDlist[:,0],int_twoDlist[:,1], 70)"
+23,calculates the MAE of the root node,"def MAE(y, y_true, y_false): **     y_true_hat = np.mean(y_true) **     y_false_hat = np.mean(y_false) ***   y_hat = np.mean(y) **    old_mae = np.mean(np.absolute(y-y_hat))  **     new_mae = len(y_true)/ len(y)  ** np.mean(np.absolute(y_true-y_true_hat)) + \  **      len(y_false)/ len(y) * np.mean(np.absolute(y_false-y_false_hat))  ***    return old_mae, new_mae"
+24,,"MAE(int_twoDlist[:,1],y_true,y_false)"
+25,best_split,"def get_best_split(data): **     x = data[:,0] **     y = data[:,1] **     split_pts = splits(x) **    results = {} **    for point in split_pts: **     x_true, y_true, x_false , y_false = split_data(x,y, point) **     errors = MAE(y, y_true, y_false)  **         results[point] = errors **     best_point = min(results,key=results.get) **     return results,best_point"
+26,,get_best_split(int_twoDlist)
+27,Modify Part 3 code so that it can handle more than 1 feature,"def get_best_split_features(data): **     n_feature = data.shape[1] - 1  **     results = {} **     for feature_idx in range(n_feature): ***       x = data[:,feature_idx]  **   y = data[:,-1]  **      split_pts = splits(x)  **         for point in split_pts: **  x_true, y_true, x_false , y_false = split_data(x,y, point) **        errors = MAE(y, y_true, y_false) **       results[feature_idx,point] = errors **     best_point = min(results,key=results.get)  **  return results,best_point"
+28,test it = Modify Part 3 code so that it can handle more than 1 feature,"int_nDlist = rnd_list.integers(low=5, high=100, size = (5,5))  **  get_best_split_features(int_nDlist)"
+29,KEVAL KNN - features,from sklearn.datasets import load_iris ** from sklearn.metrics import accuracy_score ** from sklearn.neighbors import KNeighborsClassifier ** import pandas as pd *** import numpy as np
+30,load data and make it a dataframe with pandas,"iris_data = load_iris() ** load_iris().feature_names ** df = pd.DataFrame(data=load_iris().data, columns=load_iris().feature_names) ** df.shape"
+31,select X and Y,"X = df[['sepal length (cm)', 'sepal width (cm)']] ** y = iris_data.target"
+32,split data with sklearn,"from sklearn.model_selection import train_test_split ** X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 110)"
+33,model kmnn with sklearn,"knn_class = KNeighborsClassifier(n_neighbors = 3,p=3) ** knn_class.fit(X_train,y_train) ** y_pred = knn_class.predict(X_test)"
+34,accuracy,"acc=accuracy_score(y_test,y_pred)"
+35,KEVAL KNN - ALL,"from sklearn.model_selection import train_test_split **  from sklearn.datasets import load_iris ** # features, X = load_iris().data ** # target.  y = load_iris().target"
+36,# splitting the data in 75% training and 25% testing,"X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=12)"
+37,# defining and fitting the model/ training the data on model.,"from sklearn.neighbors import KNeighborsClassifier ** model1 = KNeighborsClassifier(n_neighbors=5) **  model1.fit(X_train, y_train)"
+38,# print training score & # print testing score,"print(f""training accuracy:{model1.score(X_train, y_train):.2%}"") *** print(f""testing accuracy: {model1.score(X_test, y_test):.2%}"")"
+39,METRICS,import numpy as np  ** from numpy.random import default_rng  ** import matplotlib.pyplot as plt
+40,function MSE,"rng = np.random.default_rng(132) ** y = rng.uniform(2,10,10)  ** pred = rng.uniform(2,10,10) ///
+def mse(y,pred): **   error = y-pred **   sqr_error = error*error  **   mse= sqr_error.sum()/len(y)  /// mse(y,pred)"
+41,function  MAE,"def mae(y,pred): **   return  np.mean(np.abs(y - pred))"
+42,function  R2,"def r_sqr(y, pred): **   test_r = 1 - (np.sum((y-pred)**2))/(np.sum((y-np.mean(y))**2)) **   return test_r /// r_sqr(y, pred)"
+43,SKLEARN metrics FOR REGRESSION,"from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score *** mean_squared_error(y,pred) ***mean_absolute_error(y, pred) ** r2_score(y,pred)"
+44,"create array & TP,Tn, FP, FN","y= np.array([0,0,0,0,1,1,1,1]) *** pred= np.array([1,0,1,1,1,1,1,0])    ///  true_positives = np.sum((y == 1) & (pred == 1)) *** true_negatives = np.sum((y == 0) & (pred == 0))  ** false_positives = np.sum((y == 0) & (pred == 1)) ** false_negatives = np.sum((y == 1) & (pred == 0))"
+45,#function ACCURACY,"def accuracy(tp,tn,fp,fn): **   acc = (tp+tn)/(tp+tn+fp+fn) **   return acc /// accuracy(true_positives,true_negatives,false_positives,false_negatives)"
+46,#function PRECISION,"def precision(tp,fp): ***   pres= (tp)/(tp+fp) **   return pres  /// precision(true_positives,false_positives)"
+47,#function RECALL,"def recall(tp,fn): **   rec= tp/(tp+fn)  **   return rec  ///  recall(true_positives,true_negatives)"
+48,#function F1-SCORE,"def f_one(tn,tp,fn):  **   f_one_formula= (2*precision(tn,tp)*recall(tp,fn))/(precision(tn,tp)+recall(tp,fn))  **   return f_one_formula   ///   f_one (true_positives, true_negatives,false_negatives)"
+49,"SKLEARN metrics FOR CLASIFITCATION (accuracy, precision, recall, F1-score)","from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score  /// accuracy_score(y,pred)  *** precision_score(y,pred)   *** recall_score(y,pred) ** f1_score(y,pred)"
+50,"train, validation, and test sets",Train set: Subset of data used to train the model. The model is exposed to this data during training and learns to make predictions based on it.  ** Validation set: Separate subset of data used to evaluate the model's performance during training. Used to tune hyperparameters and make decisions about model selection. ** Test set: Another separate subset of data used to evaluate the performance of the final model. Used to estimate the model's generalization performance on unseen data.
+51,how a random forest is created,Random forest is an ensemble learning method that combines multiple decision trees to create a more accurate and robust model.
+52,steps of kNN,K-nearest neighbors (kNN) is a supervised machine learning algorithm used for classification and regression tasks. It works by finding the k-nearest data points in the training dataset to a given input point and classifying or regressing based on the labels of those k-nearest neighbors. ** 1)Load the dataset ** 2)Initialize K ** 3)Calculate Distance ** 4)Sort: Sort the distance calculation in ascending order based on distance values. ** 5)Select K-Nearest Neighbors: Select the K-nearest neighbors based on the sorted distance calculations. ** 6)Class Prediction: Use the class labels of the K-nearest neighbors to determine the class of the query instance. **  &)Evaluate: Evaluate the accuracy of the model using a validation set or cross-validation.
+53,prune decision trees,"Pruning is a technique used in decision tree learning to reduce the size of the tree by removing nodes that provide little information gain or do not improve the overall accuracy of the model. The main idea behind pruning is to prevent overfitting, which occurs when the model is too complex and captures noise in the training data."
+54,out-of-bag sample and how is it used to estimate model error,"An out-of-bag (OOB) sample is a data point that is not used in the bootstrap sample to train a random forest model, and it is used to estimate the model's accuracy without the need for a separate validation set. OOB samples are used to calculate the OOB error, which is an estimate of the model's generalization error."
+55,overfitting,"Overfitting is when a model learns the noise in the training data instead of the underlying pattern, resulting in a model that performs well on the training data but poorly on new, unseen data"
+56,Disadvantage of decision trees,"Overfitting: Decision trees can easily overfit the training data, which means that the tree is too complex and fits the noise in the data as well as the signal. This can result in poor generalization performance on new data ** Instability: Small variations in the data can result in a completely different tree. This can make decision trees unstable and difficult to interpret. ** Bias: Decision trees can be biased towards features with more levels or features that appear earlier in the dataset."
+57,R2,statistical measure that represents the proportion of the variance in the dependent variable that is explained by the independent variables in a regression mode
+58,Hyperparameter vs Paramete,"Parameters are learned by the model during training and represent the internal settings or variables that are optimized to improve the model's performance on the training data. In contrast, hyperparameters are set by the user before training and control the behavior of the learning algorithm, such as the speed of convergence or complexity of the model."
+59,Cross validation,"Cross-validation is a technique used to evaluate the performance of a machine learning model on an independent dataset. The idea behind cross-validation is to split the available data into several parts, called ""folds,"" and then use each fold in turn as a validation set while the rest of the data is used for training."
+60,,"X = df.drop('target', axis=1)"
+61,memorization,Memorization of the training data will typically: Work well for the training data but not be able to make accurate predictions for any other data.
+62,knn prediction ,"In kNN regression, when predicting a value for a new data point, we typically: Average the k target values of the k nearest neighbors to predict the value."
+63,training data,The training dataset is used to: Learn the values of the network parameters that minimize the error
+64,ML rows and columns,"In a machine learning problem, when the data is organized in a DataFrame: (Rows, Columns) typically represent (samples, features)"
+65,start point in ML,"For any machine learning endeavor, the best starting point is to:  Clearly define the problem you are trying to solve."
+66,generalize,"We say a model is able to generalize if: It predicts well on new, unseen data."
+67,train test split,"The train_test_split(X, y) function typically returns:  2 dataframes/arrays."
+68,randomnesss element,One element of the randomness in a random forest model comes from: Bootstrap sampling.
+69,MSE formula,np.sum((y-y_hat)**2)/n  =mse
