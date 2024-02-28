@@ -1,0 +1,4 @@
+"from scipy.stats import geom | k= 10 | p= 0.35 | probability = geom.pmf(k, p) | probability"
+"r = 10 | p = 0.1  | num_trials = 30  | probability = stats.nbinom.pmf(num_trials - r, r, p)"
+"from scipy.stats import poisson | lamda = 2.5 | k= 3 | probability = poisson.pmf(k, lamda)"
+import numpy as np | p = 0.80  | n = 25 | p_hat = n * p | standard_error = np.sqrt(p * (1 - p) / n) | upper_limit = (p + standard_error)*100 | lower_limit = (p - standard_error)*100
