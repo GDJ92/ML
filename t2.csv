@@ -1,0 +1,63 @@
+KNN,
+"def euclidean_distance(point1, point2): /*/     return np.sqrt(sum((point1-point2)**2))",
+"def manhattan_distance(point1, point2): /*/    return np.sum(np.abs(point1-point2))",
+"def minkowski_distance(point1, point2,p): /*/    return np.power(sum(np.abs(point1-point2)**p),1/p)",
+"def predict_price(X_train,y_train,sample,k=5,p):/*/     distances = [] /*/     for x in X_train.to_numpy(): /*/         distance = minkowski_distance(sample,x,p)/*/        distances.append(distance)/*/     sorted_distances = np.argsort(distances) /*/     k_nearest_targets = y_train[sorted_distances[:k]] /*/     predict_price = np.mean(k_nearest_targets) /*/     return predict_price",
+"def predict_class(X_train,y_train,sample,k=5,p): /*/     distances = [] /*/     for x in X_train.to_numpy(): /*/         distance = minkowski_distance(sample,x,p) /*/         distances.append(distance)/*/     sorted_distances = np.argsort(distances) /*/     k_nearest_targets = y_train[sorted_distances[:k]] /*/     class_counts = np.bincount(k_nearest_targets) /*/     prediction = agrmax(class_counts) /*/     return prediction",
+"def calculate_mse_for_k(X_train,y_train,X_test,y_test,k,p): /*/     y_preds= [] /*/     for sample in X_test.to_numpy(): /*/         y_pred = predict_price(X_train,y_train,sample,k,p)/*/         y_preds.append(y_pred) /*/    mse = mean_squared_error(y_test,y_preds) /*/    return mse",
+"k_values = range(3,30) /*/ mse_values= [] /*/ for k in k_values: /*/     mse = calculate_mse_for_k(X_train,y_train,X_test,y_test,k,p=3) /*/     mse_values.append(mse) /*/ mse_values ",
+"from sklearn.model_selection import train_test_split /*/ from sklearn.neighbors import KNeighborsRegressor /*/ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.02 , random_state = 110) /*/knn_regressor = KNeighborsRegressor(n_neighbors=11,p=3) /*/ knn_regressor.fit(X_train,y_train) /*/ y_pred = knn_regressor.predict(X_test) /*/mse = mean_squared_error(y_test,y_pred)",
+DT,
+def splits(x): /*/     splits_points = [] /*/     x_sorted = sorted(x)/*/     for i in range(len(x)-1): /*/         mid_point = (x_sorted[i] + x_sorted[i+1])/2/*/         splits_points.append(mid_point) /*/    return splits_points,
+"def splits_per_col(data): /*/     col_split_pts = {} /*/     ncols = data.shape[1] /*/    for c in range(ncols):/*/         split_pts = splits(data[:,c])/*/         col_split_pts['col_'+ str(c)] = split_pts/*/    return col_split_pts",
+"def split_data(x,y,split_pt): /*/     mask = x > split_pt /*/     anti_mask = x < split_pt /*/    x_true = x[mask] /*/    y_true = y[mask]/*/     x_false = x[anti_mask]/*/     y_false = y[anti_mask]/*/    return x_true, y_true, x_false , y_false",
+"x_true, y_true, x_false , y_false =split_data(int_twoDlist[:,0],int_twoDlist[:,1], 70)",
+"def MAE(y, y_true, y_false): /*/     y_true_hat = np.mean(y_true) /*/     y_false_hat = np.mean(y_false)/*/     y_hat = np.mean(y) /*//*/     old_mae = np.mean(np.absolute(y-y_hat))/*/     new_mae = len(y_true)/ len(y) * np.mean(np.absolute(y_true-y_true_hat)) + \ len(y_false)/ len(y) * np.mean(np.absolute(y_false-y_false_hat)) /*/    return old_mae, new_mae",
+"def get_best_split(data): /*/     x = data[:,0]  /*/      y = data[:,1]  /*/      split_pts = splits(x)  /*/      results = {}  /*/       for point in split_pts:  /*/           x_true, y_true, x_false , y_false = split_data(x,y, point)  /*/           errors = MAE(y, y_true, y_false) /*/          results[point] = errors  /*/ best_point = min(results,key=results.get)  /*/      return results,best_point",
+"from sklearn.model_selection import train_test_split /*/ X_train, X_test, y_train, y_test = train_test_split(x, y, random_state=0) /*/ regr = DecisionTreeRegressor(random_state =122) /*/regr.fit(X, y) /*/ y_1 = regr.predict(X_test) /*/ /*/ from sklearn.metrics import mean_squared_error /*/ mean_squared_error(y, preds)",
+"oob_score=[] /*/ for i in range(10): /*/     rf= RandomForestRegressor(n_estimators=100, n_jobs= -1, oob_score= True) /*/     rf= rf.fit(X_train, y_train) /*/     oob_score.append(rf.oob_score_) /*//*/ avg_oob_score = np.mean(oob_score)",#  Evaluating OOB after 10 runs
+RF,
+"oob_samples =[] #AVG num of OOB samples /*/ for i in range(1,100):  /*/     bs = rand.choice(data,data.shape[0],replace=True) /*/     n_unique_samples = np.unique(bs, axis=0).shape[0] /*/     oob = (data.shape[0] - n_unique_samples) / data.shape[0] /*/   oob_samples.append(oob) /*/ np.mean(oob_samples)   ",
+"def bs_sampling(data): /*/     bs = rand.choice(data,data.shape[0],replace=True)/*/     unique_bs = np.unique(bs, axis=0) /*/     oob=[] /*/     for row in data: /*/         if sum(np.isin(row,unique_bs))==0:/*/             oob.append(row) /*/     return bs,np.array(oob)",
+"bs,oob = bs_sampling(data)",
+"from sklearn.tree import DecisionTreeRegressor /*/ def create_tree(data): /*/     X = data[:,0:-1]/*/     y = data[:,-1] /*/     dt = DecisionTreeRegressor() /*/    dt.fit(X,y) /*/     return dt",
+"def simple_rf(data): /*/     bs,oob = bs_sampling(data)/*/     print(f""oob:"",oob)/*/     total_features = data.shape[1]-1/*/     rand_n_of_feaures = int(np.sqrt(total_features)) /*/     selected_features = rand.choice(total_features,rand_n_of_feaures,replace=False)  /*/     selected_features_with_y = np.append(selected_features,-1)  /*/     sample_data = bs[:,selected_features_with_y]  /*/     dt = create_tree(sample_data)  /*/     sample_oob = oob[:,selected_features]  /*/    preds = dt.predict(sample_oob) /*/     return preds ",
+RF2_ regression,
+"X = rent[['bedrooms','bathrooms','latitude','longitude']] /*/ y = rent['price']",
+"from sklearn.ensemble import RandomForestRegressor  /*/ rf = RandomForestRegressor(n_estimators = 10) /*/ rf.fit(X,y)",
+"unseen_sample = np.array([2,2,40,-73])  /*/ rf.predict([unseen_sample])",
+"from sklearn.metrics import mean_absolute_error  /*/ preds = rf.predict(X)  /*/ e = mean_absolute_error(y,preds) /*/ ep = e / y.mean() * 100 /*/ print(f""${e:.0f} average error; {ep:.2f}% error"")",Does the model capture training data relationships? /*/ #FIRST MODEL
+"from sklearn.model_selection import train_test_split  /*/ X_train, X_test, y_train , y_test = train_test_split(X,y, test_size = 0.25)",#SPLIT
+"rf = RandomForestRegressor(n_estimators = 10)  /*/ rf.fit(X_train,y_train)",#second model
+"preds = rf.predict(X_test)  /*/ e = mean_absolute_error(y_test,preds)  /*/ ep = e / y.mean() * 100",MAE second model
+"rf_100 = RandomForestRegressor(n_estimators = 200)  /*/ rf_100.fit(X_train,y_train)","Hyperparameters, Third model"
+"preds = rf_100.predict(X_test)  /*/ e = mean_absolute_error(y_test,preds)  /*/ ep = e / y.mean() * 100",MAE third model
+"from rfpimp import *  /*/ features_ranking = importances(rf_100, X_test, y_test)",Feature impratances
+rf3_Clasification,
+"X = cancer.data  /*/ y = cancer.target  /*/ df = pd.DataFrame(X, columns = cancer.feature_names)","define X, y"
+"X_train, X_test, y_train , y_test = train_test_split(df,y, test_size = 0.20)",split
+"from sklearn.ensemble import RandomForestClassifier  /*/ cl = RandomForestClassifier(n_estimators=200) /*/ cl.fit(X_train,y_train)",model
+"from sklearn.metrics import accuracy_score , confusion_matrix  /*/ preds = cl.predict(X_test)  /*/ e = accuracy_score(y_test,preds)  /*/confusion_matrix(y_test,preds)","prediction, accuracy"
+"features_ranking = importances(cl, X_test, y_test)",
+DENOISING,
+"numfeatures = ['bathrooms', 'bedrooms', 'longitude', 'latitude']  /*/  X = rent_clean[numfeatures]  /*/  y = rent_clean['price']  /*/  rf = RandomForestRegressor(n_estimators=100, n_jobs=-1, oob_score=True)  /*/  rf.fit(X, y)  /*/  oob_baseline = rf.oob_score_",Reestablish Baseline
+"def evaluate(X, y):  /*/      rf = RandomForestRegressor(n_estimators=100, n_jobs=-1, oob_score=True)  /*/      rf.fit(X, y)  /*/      oob = rf.oob_score_  /*/      n = rfnnodes(rf)  /*/      h = np.median(rfmaxdepths(rf))  /*/      print(f""OOB R^2 is {oob:.5f} using {n:,d} tree nodes with {h} median tree depth"")  /*/      return rf, oob",
+"def perm_importances(X, y):  /*/      rf = RandomForestRegressor(n_estimators=100, n_jobs=-1, oob_score=True, random_state=999)  /*/      rf.fit(X, y)  /*/      r2 = rf.oob_score_  /*/      print(f""Baseline R^2 with no columns permuted: {r2:.5f}\n"")  /*/      for col in X.columns:  /*/          X_col = X.copy()  /*/          X_col[col] = X_col[col].sample(frac=1).values  /*/          rf.fit(X_col, y)  /*/          r2_col = rf.oob_score_  /*/          print(f""Permuting column {col}: new R^2 is {r2_col:.5f} and difference from baseline is {r2 - r2_col:.5f}"")",Feature Importance - permutatioon importance
+"perm_importances(X, y)",
+"def drop_importances(X, y):  /*/      rf = RandomForestRegressor(n_estimators=100, n_jobs=-1, oob_score=True, random_state=999)  /*/      rf.fit(X, y)  /*/      r2 = rf.oob_score_  /*/      print(f""Baseline R^2 with no columns dropped: {r2:.5f}\n"")  /*/     for col in X.columns:  /*/  X_col = X.copy()  /*/          X_col = X_col.drop(col, axis=1)   /*/          rf.fit(X_col, y)  /*/          r2_col = rf.oob_score_  /*/          print(f""Dropping column {col}: new R^2 is {r2_col:.5f} and difference from baseline is {r2 - r2_col:.5f}"")",Feature Importance - drop importance
+"drop_importances(X, y)",
+X_dup = X.copy()  /*/  X_dup['bedrooms_dup'] = X_dup['bedrooms']  /*/  X_dup.head(),Be Careful With Correlation
+"drop_importances(X_dup, y)",
+"noise = np.random.normal(0, 2, X_dup.shape[0])  /*/  X_dup['bedrooms_dup'] = X_dup['bedrooms'] + noise  /*/  X_dup.head()",Breaking Correlation
+"drop_importances(X_dup, y)",
+"#If data1.sample(n=91,random_state=54) is your data where 'sex' is target, what would be the feature importance for feature 'hip.gi' /*/# with using baseline random forest model with 77 trees and random_state = 54?",
+"df= data1.sample(n=91, random_state=54)  /*/  clf = RandomForestClassifier(n_estimators=77,random_state=54)  /*/  x= df.drop('sex', axis=1)  /*/  y= df[['sex']]  /*/  clf.fit(x,y)  /*/  pd.Series(index = cl.feature_names_in_, data = cl.feature_importances_)",
+"# take a random sample with n =500 and random_state = 67.  map Method feature with provided value {'S':45, 'VB':23, 'SP':67, 'PI':12, 'SA':55} and match the index 367.",
+"df['Method'] = df['Method'].map( {'S':45, 'VB':23, 'SP':67, 'PI':12, 'SA':55}) /*/ df_sample  = df.sample(n = 500, random_state = 67) /*/ df_sample.iloc[367]",
+Apply one hot encoding on sample with n =250 and random_state = 89 use Method feature and match the index at 500.,
+"df_onehot= pd.get_dummies(data= df, columns=['Method']) /*/ df_onehot.sample(n=250, random_state=89).iloc[[58]]",
+# Calculate Euclidean distance,
+df['x1']= -37.7273 /*/  df['y2']= 144.9530 /*/df['euclidean_distance'] = np.sqrt((df['Lattitude'] - df['x1'])**2 + (df['Longtitude'] - df['y2'])**2) /*/ df.iloc[[500]],
+"And what we have done so far is: /*/ ignored non-numeric data;  /*/ built and evaluated a random forest model, which had:  /*/ a poor avg  ??2 /*/   and mean absolute error on the validation data;  /*/ high variance in  ??2 /*/   and mean absolute error on the validation data; /*/ explored our data for anomalies in the context of our objective to predict apartment rental prices for a typical apartment in New York City;  /*/ cleaned our data to remove the anomalies we discovered;  /*/ built and evaluated a random forest model using the cleaned data",
+This tells us that: /*/ ??2=1   means our model is perfect;  /*/ ??2?0   means our model does no better than just predicting the average;  /*/ ??2<<0   means our model does worse than predicting the average.,
+"Other Indicators /*/ We are not only interested in  ??2 /*/ . We would also like to know: /*/ how much work the random forest model has to do to capture the relationship between the features and the target; /*/ the typical tree depth, as this will impact the speed of predictions for new data; /*/ how important different features are for a given model.",
